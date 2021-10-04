@@ -1,18 +1,17 @@
 const { src, dest, watch, parallel, series } = require("gulp");
-const browserSync = require("browser-sync").create();
-const sass = require("gulp-sass")(require("sass")); // выполняем require по инструкции пакета https://www.npmjs.com/package/gulp-sass
-const concat = require("gulp-concat");
-const uglify = require("gulp-uglify-es").default;
-const autoPrefixer = require("gulp-autoprefixer");
-const imagemin = require("gulp-imagemin");
-const del = require("del");
-// здесь параметры мы никакие не используем
+const browserSync                            = require("browser-sync").create();
+const sass                                   = require("gulp-sass")(require("sass"));
+const concat                                 = require("gulp-concat");
+const autoPrefixer                           = require("gulp-autoprefixer");
+const imagemin                               = require("gulp-imagemin");
+const del                                    = require("del");
+const terser                                 = require("terser");
+const gulpTerser                             = require("gulp-terser");
+
+
 function openDevServer() {
   browserSync.init({
-    // правильно указываем название нашего модуля browserSync, а не browsersync, назовем функцию тогда подругому типо openDevServer
     server: {
-      // тут указываем папку, в котором будет наш html - то есть в папке public у нас самый главный файл,
-      // который будет считываться для browserSync пакета
       baseDir: "public/",
     },
     port: 3000,
@@ -26,7 +25,7 @@ function cleanDist() {
 }
 
 function imageMin() {
-  return src("public/img/**/*")
+  return src("public/images/**/*")
     .pipe(
       imagemin([
         imagemin.gifsicle({ interlaced: true }),
@@ -43,7 +42,7 @@ function imageMin() {
 function scripts() {
   return src(["node_modules/jquery/dist/jquery.js", "src/js/script.js"])
     .pipe(concat("main.min.js"))
-    .pipe(uglify())
+    .pipe(gulpTerser({}, terser.minify))
     .pipe(dest("public/js"))
     .pipe(browserSync.stream());
 }
@@ -78,7 +77,7 @@ function build() {
 }
 function watching() {
   watch(["src/scss/**/*.scss"], styles); // здесь мы отслеживаем изменения во всех папках где есть файлы с расширением .scss в папке src/scss
-  watch(["src/js/main.js", "!src/js/main.min.js"], scripts);
+  watch(["src/js/*.js"], scripts);
   watch(["public/*.html"]).on("change", browserSync.reload); // отслеживаем изменения в файлах с расширением .html в папке public
 }
 
@@ -93,4 +92,4 @@ exports.cleanDist = cleanDist;
 exports.build = series(cleanDist, imageMin, build);
 // тут мы указываем имена функция, которые хотим выполнить при дефолтной команде gulp
 // то есть мы хотим обрабатывать styles и browsersync и watching обновременно
-exports.default = parallel(styles, openDevServer, watching, scripts);
+exports.default = parallel(styles, scripts, openDevServer, watching);

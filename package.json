@@ -16,9 +16,12 @@
     "gulp-concat": "^2.6.1",
     "gulp-imagemin": "7.1.0",
     "gulp-sass": "^5.0.0",
-    "gulp-uglify-es": "^3.0.0",
+    "gulp-terser": "^2.1.0",
     "jquery": "^3.6.0",
     "sass": "^1.42.1",
     "webp-converter": "^2.2.3"
+  },
+  "dependencies": {
+    "terser": "^5.9.0"
   }
 }
