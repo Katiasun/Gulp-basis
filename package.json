@@ -24,6 +24,7 @@
     "webp-converter": "^2.2.3"
   },
   "dependencies": {
+    "gulp-htmlmin": "^5.0.1",
     "gulp-if": "^3.0.0",
     "terser": "^5.9.0",
     "yargs": "^17.2.1"

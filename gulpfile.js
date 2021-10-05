@@ -7,12 +7,14 @@ const imagemin                               = require("gulp-imagemin");
 const del                                    = require("del");
 const terser                                 = require("terser");
 const gulpTerser                             = require("gulp-terser");
+const htmlmin                                = require('gulp-htmlmin');
 const gulpif                                 = require('gulp-if');
 const yargs                                  = require('yargs/yargs')
 const { hideBin }                            = require('yargs/helpers')
 const argv                                   = yargs(hideBin(process.argv)).argv;
 
 const config = {
+  srcHTML: "public/index.html",
   srcImgs: "public/img/**/*",
   srcJS: "src/js/script.js",
   srcStyles: "src/scss/style.scss",
@@ -34,6 +36,17 @@ function openDevServer() {
     notify: false,
     open: false, // разкоментить, если не хочешь чтобы постоянно новые вкладки открывались
   });
+}
+
+function layout() {
+  return src(config.srcHTML)
+    .pipe(gulpif(prodMode, htmlmin({ 
+      collapseWhitespace: true, 
+      useShortDoctype: true, 
+      minifyURLs: true, 
+      removeComments: true 
+    })))
+    .pipe(dest("dist"));
 }
 
 function cleanDist() {
@@ -85,7 +98,6 @@ function build() {
       "public/css/style.min.css",
       "public/fonts/**/*",
       "public/js/main.min.js",
-      "public/*.html",
     ],
     { base: "public" }
   ).pipe(dest("dist"));
@@ -100,12 +112,13 @@ function watching() {
 // добавляем новые методы
 exports.openDevServer = openDevServer;
 exports.styles = styles;
+exports.layout = layout;
 exports.watching = watching;
 exports.scripts = scripts;
 exports.imageMin = imageMin;
 exports.cleanDist = cleanDist;
 
-exports.build = series(cleanDist, styles, scripts, imageMin, build);
+exports.build = series(cleanDist, styles, scripts, imageMin, layout, build);
 // тут мы указываем имена функция, которые хотим выполнить при дефолтной команде gulp
 // то есть мы хотим обрабатывать styles и browsersync и watching обновременно
 exports.default = parallel(styles, scripts, openDevServer, watching);
