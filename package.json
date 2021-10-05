@@ -4,7 +4,9 @@
   "description": "assembly gulp",
   "main": "index.hml",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "gulp --dev",
+    "build": "gulp build --prod"
   },
   "author": "fls",
   "license": "ISC",
@@ -22,6 +24,8 @@
     "webp-converter": "^2.2.3"
   },
   "dependencies": {
-    "terser": "^5.9.0"
+    "gulp-if": "^3.0.0",
+    "terser": "^5.9.0",
+    "yargs": "^17.2.1"
   }
 }
